@@ -1,0 +1,6 @@
+{
+  "name": "TGAI2017",
+  "devDependencies": {
+    "eslint": "^3.17.1"
+  }
+}
