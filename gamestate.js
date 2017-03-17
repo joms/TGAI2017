@@ -54,6 +54,14 @@ gameState.prototype.update = function(data)
             this.pellets = this.state.map.pelletsleft;
 
             this.map = parser.ParseMap(this.state.map.content);
+
+            for (var i = 0; i < this.state.others.length; i++) {
+                var o = this.state.others[i];
+                if (o.isdangerous) {
+                    this.map[o.y][o.x] = 0;
+                }
+            }
+
             this.findMove();
             break;
     }
@@ -64,14 +72,21 @@ gameState.prototype.update = function(data)
  */
 gameState.prototype.findMove = function() {
     // Basic A* functionality
+    var navigator = new Navigator(this.map);
+    var closestPlayer = navigator.findClosestPlayer(this.me, this.state.others);
+
+    if (this.me.isDangerous && !closestPlayer.isDangerous) {
+        var target = closestPlayer;
+    } else {
+        var target = navigator.findClosestPellet(this.me);
+    }
+
     var graph = new Graph(this.map);
     var start = graph.nodes[this.me.y][this.me.x];
-    var end = graph.nodes[4][1];
+    var end = graph.nodes[target.y][target.x];
     var result = astar.search(graph.nodes, start, end);
 
-    var navigator = new Navigator(result, this.map);
-    // var move = navigator.randomMove(); // This is where you would use A* (astar.js)
-    this.sendToServer(navigator.move(0));
+    this.sendToServer(navigator.move(result, 0));
 }
 
 /**

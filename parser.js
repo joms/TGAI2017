@@ -29,8 +29,8 @@ function Weight(point)
         floor:1,
         wall:0,
         door:1,
-        pellet:2,
-        superPellet:3
+        pellet:50,
+        superPellet:100
     };
 
     switch (point) {

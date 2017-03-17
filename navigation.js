@@ -1,8 +1,7 @@
 module.exports = navigator;
 
-function navigator(path, map)
+function navigator(map)
 {
-    this.path = path;
     this.map = map;
     this.moves = [
         "RIGHT\n",
@@ -13,16 +12,68 @@ function navigator(path, map)
 }
 
 /**
+ * Find the closest pellet
+ * @param position
+ * @returns {{x: number, y: number, distance: number}}
+ */
+navigator.prototype.findClosestPellet = function(position)
+{
+    var closest = {
+        x: 0,
+        y: 0,
+        distance: 1000
+    };
+
+    for (var y = 0; y < this.map.length; y++) {
+        for (var x = 0; x < this.map[y].length; x++) {
+            if (this.map[y][x] == 50 || this.map[y][x] == 100) {
+                var dist = this.lineDistance(position, {x:x, y:y});
+                if (dist < closest.distance) {
+                    closest.x = x;
+                    closest.y = y;
+                    closest.distance = dist;
+                }
+            }
+        }
+    }
+
+    return closest;
+}
+
+navigator.prototype.findClosestPlayer = function(position, players)
+{
+    var closest = {
+        x: 0,
+        y: 0,
+        isDangerous: false,
+        distance: 1000
+    };
+
+    for (var i = 0; i < players.length; i++) {
+        var p = players[i];
+        var dist = this.lineDistance(position, p);
+        if (dist < closest.distance) {
+            closest.x = p.x;
+            closest.y = p.y;
+            closest.isDangerous = p.isdangerous;
+            closest.distance = dist;
+        }
+    }
+
+    return closest;
+}
+
+/**
  * Calculates the direction of a given move using A*
  */
-navigator.prototype.move = function(num)
+navigator.prototype.move = function(path, num)
 {
-    if (this.path.length == 0)
+    if (path.length == 0)
     {
         return false;
     }
 
-    var p = this.path[num];
+    var p = path[num];
 
     var move;
 
@@ -44,6 +95,23 @@ navigator.prototype.move = function(num)
     }
 
     return this.moves[move];
+}
+
+/**
+ * Returns the distance from one {x: x, y: y} to another.
+ */
+navigator.prototype.lineDistance = function(point1, point2)
+{
+    var xs = 0;
+    var ys = 0;
+
+    xs = point2.x - point1.x;
+    xs = xs * xs;
+
+    ys = point2.y - point1.y;
+    ys = ys * ys;
+
+    return Math.sqrt(xs + ys);
 }
 
 /**
