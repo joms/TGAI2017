@@ -13,10 +13,15 @@ function navigator(path, map)
 }
 
 /**
- * Calculates the direction of a given move
+ * Calculates the direction of a given move using A*
  */
 navigator.prototype.move = function(num)
 {
+    if (this.path.length == 0)
+    {
+        return false;
+    }
+
     var p = this.path[num];
 
     var move;
@@ -44,31 +49,9 @@ navigator.prototype.move = function(num)
 /**
  * Gives you a random direction to move in
  */
-navigator.prototype.RandomMove = function()
+navigator.prototype.randomMove = function()
 {
     return this.moves[Math.floor(Math.random()* 4)];
-}
-
-/**
- * Returns what the next tile is
- */
-navigator.prototype.NextTile = function(num)
-{
-    var p = this.path[num];
-    var m = this.map[p.x][p.y];
-    if (m==999){
-        return "GRASS"
-    }
-
-    if (m>0 && m<100){
-        return "GRASS"
-    }
-    if (m == 100) {
-        return "ROCK"
-    };
-    if (m == 0) {
-        return "WALL"
-    }
 }
 
 /**
@@ -77,13 +60,6 @@ navigator.prototype.NextTile = function(num)
  */
 navigator.prototype.Opposite = function(move)
 {
-    var moves = [
-        "RIGHT\n",
-        "LEFT\n",
-        "DOWN\n",
-        "UP\n"
-    ];
-
     switch(move)
     {
         case "RIGHT\n":
@@ -95,12 +71,4 @@ navigator.prototype.Opposite = function(move)
         case "UP\n":
             return this.moves[2];
     }
-}
-
-/**
- * Sets a coordinate in the map to whatever you feel like
- */
-navigator.prototype.update = function(x, y, i)
-{
-    this.map[x][y] = i;
 }

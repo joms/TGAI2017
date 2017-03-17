@@ -1,10 +1,7 @@
 /**
- * Parses the map to a point-based system.
- *
- * If flee is set to true, the weighting-function will
- * treat rocks as non-walkable
+ * Parses the map to a point-based system fit for A*.
  */
-exports.ParseMap = function (data, fear)
+exports.ParseMap = function (data)
 {
     var map = [];
 
@@ -13,7 +10,7 @@ exports.ParseMap = function (data, fear)
         var t = [];
         for (var j = 0; j < data[i].length; j++)
         {
-            t.push(Weight(data[i][j], fear));
+            t.push(Weight(data[i][j]));
         }
         map.push(t);
     }
@@ -25,23 +22,45 @@ exports.ParseMap = function (data, fear)
  * Weights each point according to whatever value we have
  * defined for that point-type.
  */
-function Weight(point, f)
+function Weight(point)
 {
-    var weight = { wall: 0, walkable: 1, rock: 100};
+    // Tile weights for A* - higher is more attractive, 0 is no-go
+    var weight = {
+        floor:1,
+        wall:0,
+        door:1,
+        pellet:2,
+        superPellet:3
+    };
 
-    if (point == "+") {
-        return weight.wall;
-    }
-    else if (point == "#") {
-        if (f == false)
-        {
-            return weight.rock;
-        } else {
+    switch (point) {
+        case '|':
             return weight.wall;
-        }
-    }
-    else if (point == ".") {
-        return weight.walkable;
+            break;
+
+        case '_':
+            return weight.floor;
+            break;
+
+        case '-':
+            return weight.door;
+            break;
+
+        case '.':
+            return weight.pellet;
+            break;
+
+        case 'o':
+            return weight.superPellet;
+            break;
+
+        case '#':
+            return weight.floor;
+            break;
+
+        case '@':
+            return weight.floor;
+            break;
     }
 }
 
